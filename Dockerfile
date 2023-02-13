@@ -9,4 +9,11 @@ RUN go mod download
 # Building the application
 RUN go build -o /cerberus
 
+# Using a new base image to run the binary
+FROM alpine:latest  
+
+WORKDIR /root/
+
+COPY --from=0 /cerberus /cerberus
+
 CMD [ "/cerberus" ]
