@@ -7,7 +7,6 @@ on:
       - completed
     
 env: 
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/tortuga-softworks:cerberus
   IMAGE_TAG: cerberus:$(date +%s)
         
 jobs:
@@ -29,4 +28,4 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: $IMAGE_NAME:$IMAGE_TAG
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/tortuga-softworks:cerberus:${{ env.IMAGE_TAG }}
