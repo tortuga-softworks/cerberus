@@ -5,10 +5,7 @@ on:
     workflows: ["Go"]
     types:
       - completed
-    
-env: 
-  IMAGE_TAG: cerberus:$(date +%s)
-        
+      
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,4 +25,4 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/tortuga-softworks:cerberus:${{ env.IMAGE_TAG }}
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/tortuga-softworks:cerberus:latest
