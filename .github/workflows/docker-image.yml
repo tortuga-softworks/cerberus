@@ -20,14 +20,16 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-    -
-      name: Set up Docker Buildx
+    - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
-    -
-      name: Build and push
+    - name: Configure image name and tag
+      env: 
+        IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/tortuga-softworks:cerberus
+        IMAGE_TAG: cerberus:$(date +%s)
+    - name: Build and push
       uses: docker/build-push-action@v4
       with:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/tortuga-softworks:cerberus:$(date +%s)
+        tags: $IMAGE_NAME:$IMAGE_TAG
