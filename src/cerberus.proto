@@ -1,0 +1,41 @@
+syntax="proto3";
+
+package cerberus;
+
+option go_package = "github.com/tortuga-softworks/cerberus/src/cerberus";
+
+service Authentication {
+    rpc Login (LoginRequest) returns (LoginResponse);
+    rpc Logout (LogoutRequest) returns (LogoutResponse);
+    rpc ValidateSession (ValidateSessionRequest) returns (ValidateSessionResponse);
+    rpc RefreshSession (RefreshSessionRequest) returns (RefreshSessionResponse);
+}
+
+message LoginRequest {
+    string username = 1;
+}
+
+message LoginResponse {
+    string session_id = 1;
+}
+
+
+message LogoutRequest {
+    string session_id = 1;
+}
+
+message LogoutResponse {}
+
+message ValidateSessionRequest {
+    string session_id = 1;
+}
+
+message ValidateSessionResponse {
+}
+
+message RefreshSessionRequest {
+    string session_id = 1;
+}
+
+message RefreshSessionResponse {
+}
