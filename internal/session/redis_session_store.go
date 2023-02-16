@@ -22,7 +22,12 @@ func NewRedisSessionStore(addr, password string, sessionDuration int) (*RedisSes
 }
 
 func (rss *RedisSessionStore) CreateSession(username string) (*Session, error) {
-	sessionID := generateSessionID()
+	sessionID, sessionIDErr := generateSessionID()
+
+	if sessionIDErr != nil {
+		return nil, sessionIDErr
+	}
+
 	creationTime := time.Now()
 	session := Session{ID: sessionID, Username: username, CreationTime: creationTime}
 	sessionKey := "session:" + sessionID
