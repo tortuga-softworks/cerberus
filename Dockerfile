@@ -7,7 +7,7 @@ COPY . .
 RUN go mod download
 
 # Building the application
-RUN go build -o /cerberus ./src/cmd
+RUN go build -o /cerberus ./cmd
 
 # Using a new base image to run the binary
 FROM alpine:latest  

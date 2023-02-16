@@ -9,20 +9,22 @@ Environment variables:
 |---------------------------|---------------|--------------------------------------------|
 | CERBERUS_PORT             | 9000          | The port the application listens on        |
 | CERBERUS_SESSION_DURATION | 43200         | The duration of a user session, in seconds |
-| CERBERUS_CACHE_HOST       |               | The host of the cache (Redis)              |
-| CERBERUS_CACHE_PORT       |               | The port of the cache (Redis)              |
+| CERBERUS_SESSIONS_HOST    |               | The host of the sessions store (Redis)     |
+| CERBERUS_SESSIONS_PORT    |               | The port of the sessions store (Redis)     |
+| CERBERUS_USERS_HOST       |               | The host of the users store                |
+| CERBERUS_USERS_PORT       |               | The port of the users store                |
 
 ## API (TODO)
 ### Examples:
 
-    PS C:\projects\cerberus> grpcurl -plaintext -d '{\"username\": \"marem\"}' localhost:9000 cerberus.Authentication/Login
+    PS C:\projects\cerberus> grpcurl -plaintext -d '{\"username\": \"marem@tortugasoftworks\"}' localhost:9000 proto.Authentication/Login
     {
     "sessionId": "jk0obS-CSywOGgGR74NMrlJP5N-77nH5t10MBgAmHHs="
     }
-    PS C:\projects\cerberus> grpcurl -plaintext -d '{\"username\": \"\"}' localhost:9000 cerberus.Authentication/Login     
+    PS C:\projects\cerberus> grpcurl -plaintext -d '{\"username\": \"\"}' localhost:9000 proto.Authentication/Login     
     ERROR:
     Code: InvalidArgument
-    Message: the username cannot be empty
+    Message: the username is not valid
 
 ## Build
 
@@ -53,4 +55,4 @@ See https://grpc.io/docs/languages/go/quickstart/
 ### Generating gRPC source files
 To generate the gRPC server and client source files:
     
-    protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative src/cerberus.proto
+    protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/authentication.proto

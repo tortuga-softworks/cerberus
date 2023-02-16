@@ -1,8 +1,8 @@
 syntax="proto3";
 
-package cerberus;
+package proto;
 
-option go_package = "github.com/tortuga-softworks/cerberus/src/cerberus";
+option go_package = "github.com/tortuga-softworks/cerberus/proto";
 
 service Authentication {
     rpc Login (LoginRequest) returns (LoginResponse);
@@ -18,7 +18,6 @@ message LoginRequest {
 message LoginResponse {
     string session_id = 1;
 }
-
 
 message LogoutRequest {
     string session_id = 1;

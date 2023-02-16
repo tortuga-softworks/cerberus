@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.12
-// source: src/cerberus.proto
+// source: proto/authentication.proto
 
-package cerberus
+package proto
 
 import (
 	context "context"
@@ -38,7 +38,7 @@ func NewAuthenticationClient(cc grpc.ClientConnInterface) AuthenticationClient {
 
 func (c *authenticationClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
 	out := new(LoginResponse)
-	err := c.cc.Invoke(ctx, "/cerberus.Authentication/Login", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.Authentication/Login", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (c *authenticationClient) Login(ctx context.Context, in *LoginRequest, opts
 
 func (c *authenticationClient) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error) {
 	out := new(LogoutResponse)
-	err := c.cc.Invoke(ctx, "/cerberus.Authentication/Logout", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.Authentication/Logout", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (c *authenticationClient) Logout(ctx context.Context, in *LogoutRequest, op
 
 func (c *authenticationClient) ValidateSession(ctx context.Context, in *ValidateSessionRequest, opts ...grpc.CallOption) (*ValidateSessionResponse, error) {
 	out := new(ValidateSessionResponse)
-	err := c.cc.Invoke(ctx, "/cerberus.Authentication/ValidateSession", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.Authentication/ValidateSession", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (c *authenticationClient) ValidateSession(ctx context.Context, in *Validate
 
 func (c *authenticationClient) RefreshSession(ctx context.Context, in *RefreshSessionRequest, opts ...grpc.CallOption) (*RefreshSessionResponse, error) {
 	out := new(RefreshSessionResponse)
-	err := c.cc.Invoke(ctx, "/cerberus.Authentication/RefreshSession", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.Authentication/RefreshSession", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func _Authentication_Login_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/cerberus.Authentication/Login",
+		FullMethod: "/proto.Authentication/Login",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthenticationServer).Login(ctx, req.(*LoginRequest))
@@ -140,7 +140,7 @@ func _Authentication_Logout_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/cerberus.Authentication/Logout",
+		FullMethod: "/proto.Authentication/Logout",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthenticationServer).Logout(ctx, req.(*LogoutRequest))
@@ -158,7 +158,7 @@ func _Authentication_ValidateSession_Handler(srv interface{}, ctx context.Contex
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/cerberus.Authentication/ValidateSession",
+		FullMethod: "/proto.Authentication/ValidateSession",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthenticationServer).ValidateSession(ctx, req.(*ValidateSessionRequest))
@@ -176,7 +176,7 @@ func _Authentication_RefreshSession_Handler(srv interface{}, ctx context.Context
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/cerberus.Authentication/RefreshSession",
+		FullMethod: "/proto.Authentication/RefreshSession",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthenticationServer).RefreshSession(ctx, req.(*RefreshSessionRequest))
@@ -188,7 +188,7 @@ func _Authentication_RefreshSession_Handler(srv interface{}, ctx context.Context
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Authentication_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "cerberus.Authentication",
+	ServiceName: "proto.Authentication",
 	HandlerType: (*AuthenticationServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -209,5 +209,5 @@ var Authentication_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "src/cerberus.proto",
+	Metadata: "proto/authentication.proto",
 }
