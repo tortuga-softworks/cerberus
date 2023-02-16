@@ -42,11 +42,13 @@ func initSessionStore() session.SessionStore {
 	if sessionDurationString == "" {
 		sessionDuration = 43200
 		fmt.Println("No session duration configration found. Using default: 43200.")
-	}
+	} else {
+		parsedSessionDuration, err := strconv.Atoi(sessionDurationString)
+		if err != nil {
+			panic(err)
+		}
 
-	sessionDuration, err := strconv.Atoi(sessionDurationString)
-	if err != nil {
-		panic(err)
+		sessionDuration = parsedSessionDuration
 	}
 
 	sessionStore, err := session.NewRedisSessionStore(cacheHost+":"+cachePort, "", sessionDuration)
@@ -74,6 +76,11 @@ func initAuthService(sessionStore session.SessionStore) *authentication.Authenti
 
 func initListener() net.Listener {
 	port := os.Getenv("CERBERUS_PORT")
+
+	if port == "" {
+		port = "9000"
+		fmt.Println("No port configration found. Using default: 9000.")
+	}
 
 	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
