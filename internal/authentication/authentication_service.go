@@ -31,3 +31,7 @@ func (as *AuthenticationService) Login(username string) (string, error) {
 func (as *AuthenticationService) ValidateUsername(username string) bool {
 	return strings.Contains(username, "@")
 }
+
+func (as *AuthenticationService) Refresh(sessionID string) (bool, error) {
+	return as.sessionStore.RefreshSession(sessionID)
+}

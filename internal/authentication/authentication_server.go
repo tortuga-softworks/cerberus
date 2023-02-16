@@ -29,3 +29,18 @@ func (as *AuthenticationServer) Login(ctx context.Context, in *proto.LoginReques
 		return nil, status.Error(codes.InvalidArgument, "the username is not valid")
 	}
 }
+
+func (as *AuthenticationServer) Refresh(ctx context.Context, in *proto.RefreshRequest) (*proto.RefreshResponse, error) {
+	var sessionID = in.SessionId
+
+	refreshed, err := as.AuthenticationService.Refresh(sessionID)
+	if err == nil {
+		if refreshed {
+			return &proto.RefreshResponse{}, nil
+		} else {
+			return nil, status.Error(codes.NotFound, "the session does not exist")
+		}
+	} else {
+		return nil, err
+	}
+}

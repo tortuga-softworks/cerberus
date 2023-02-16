@@ -24,8 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 type AuthenticationClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
-	ValidateSession(ctx context.Context, in *ValidateSessionRequest, opts ...grpc.CallOption) (*ValidateSessionResponse, error)
-	RefreshSession(ctx context.Context, in *RefreshSessionRequest, opts ...grpc.CallOption) (*RefreshSessionResponse, error)
+	Verify(ctx context.Context, in *VerifyRequest, opts ...grpc.CallOption) (*VerifyResponse, error)
+	Refresh(ctx context.Context, in *RefreshRequest, opts ...grpc.CallOption) (*RefreshResponse, error)
 }
 
 type authenticationClient struct {
@@ -54,18 +54,18 @@ func (c *authenticationClient) Logout(ctx context.Context, in *LogoutRequest, op
 	return out, nil
 }
 
-func (c *authenticationClient) ValidateSession(ctx context.Context, in *ValidateSessionRequest, opts ...grpc.CallOption) (*ValidateSessionResponse, error) {
-	out := new(ValidateSessionResponse)
-	err := c.cc.Invoke(ctx, "/proto.Authentication/ValidateSession", in, out, opts...)
+func (c *authenticationClient) Verify(ctx context.Context, in *VerifyRequest, opts ...grpc.CallOption) (*VerifyResponse, error) {
+	out := new(VerifyResponse)
+	err := c.cc.Invoke(ctx, "/proto.Authentication/Verify", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authenticationClient) RefreshSession(ctx context.Context, in *RefreshSessionRequest, opts ...grpc.CallOption) (*RefreshSessionResponse, error) {
-	out := new(RefreshSessionResponse)
-	err := c.cc.Invoke(ctx, "/proto.Authentication/RefreshSession", in, out, opts...)
+func (c *authenticationClient) Refresh(ctx context.Context, in *RefreshRequest, opts ...grpc.CallOption) (*RefreshResponse, error) {
+	out := new(RefreshResponse)
+	err := c.cc.Invoke(ctx, "/proto.Authentication/Refresh", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -78,8 +78,8 @@ func (c *authenticationClient) RefreshSession(ctx context.Context, in *RefreshSe
 type AuthenticationServer interface {
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
-	ValidateSession(context.Context, *ValidateSessionRequest) (*ValidateSessionResponse, error)
-	RefreshSession(context.Context, *RefreshSessionRequest) (*RefreshSessionResponse, error)
+	Verify(context.Context, *VerifyRequest) (*VerifyResponse, error)
+	Refresh(context.Context, *RefreshRequest) (*RefreshResponse, error)
 	mustEmbedUnimplementedAuthenticationServer()
 }
 
@@ -93,11 +93,11 @@ func (UnimplementedAuthenticationServer) Login(context.Context, *LoginRequest) (
 func (UnimplementedAuthenticationServer) Logout(context.Context, *LogoutRequest) (*LogoutResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
 }
-func (UnimplementedAuthenticationServer) ValidateSession(context.Context, *ValidateSessionRequest) (*ValidateSessionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ValidateSession not implemented")
+func (UnimplementedAuthenticationServer) Verify(context.Context, *VerifyRequest) (*VerifyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Verify not implemented")
 }
-func (UnimplementedAuthenticationServer) RefreshSession(context.Context, *RefreshSessionRequest) (*RefreshSessionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RefreshSession not implemented")
+func (UnimplementedAuthenticationServer) Refresh(context.Context, *RefreshRequest) (*RefreshResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Refresh not implemented")
 }
 func (UnimplementedAuthenticationServer) mustEmbedUnimplementedAuthenticationServer() {}
 
@@ -148,38 +148,38 @@ func _Authentication_Logout_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Authentication_ValidateSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ValidateSessionRequest)
+func _Authentication_Verify_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthenticationServer).ValidateSession(ctx, in)
+		return srv.(AuthenticationServer).Verify(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.Authentication/ValidateSession",
+		FullMethod: "/proto.Authentication/Verify",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthenticationServer).ValidateSession(ctx, req.(*ValidateSessionRequest))
+		return srv.(AuthenticationServer).Verify(ctx, req.(*VerifyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Authentication_RefreshSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RefreshSessionRequest)
+func _Authentication_Refresh_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RefreshRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthenticationServer).RefreshSession(ctx, in)
+		return srv.(AuthenticationServer).Refresh(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.Authentication/RefreshSession",
+		FullMethod: "/proto.Authentication/Refresh",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthenticationServer).RefreshSession(ctx, req.(*RefreshSessionRequest))
+		return srv.(AuthenticationServer).Refresh(ctx, req.(*RefreshRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -200,12 +200,12 @@ var Authentication_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Authentication_Logout_Handler,
 		},
 		{
-			MethodName: "ValidateSession",
-			Handler:    _Authentication_ValidateSession_Handler,
+			MethodName: "Verify",
+			Handler:    _Authentication_Verify_Handler,
 		},
 		{
-			MethodName: "RefreshSession",
-			Handler:    _Authentication_RefreshSession_Handler,
+			MethodName: "Refresh",
+			Handler:    _Authentication_Refresh_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

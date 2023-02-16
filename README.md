@@ -15,16 +15,28 @@ Environment variables:
 | CERBERUS_USERS_PORT       |               | The port of the users store                |
 
 ## API (TODO)
-### Examples:
 
-    PS C:\projects\cerberus> grpcurl -plaintext -d '{\"username\": \"marem@tortugasoftworks\"}' localhost:9000 proto.Authentication/Login
+### Login
+Request:
+
+    grpcurl -plaintext -d '{\"username\": \"marem@tortugasoftworks\"}' localhost:9000 proto.Authentication/Login
+
+Response:
+
     {
-    "sessionId": "jk0obS-CSywOGgGR74NMrlJP5N-77nH5t10MBgAmHHs="
+    "sessionId": "94f44...a8738e"
     }
-    PS C:\projects\cerberus> grpcurl -plaintext -d '{\"username\": \"\"}' localhost:9000 proto.Authentication/Login     
-    ERROR:
-    Code: InvalidArgument
-    Message: the username is not valid
+
+### Refresh
+Request:
+
+    grpcurl -plaintext -d '{\"sessionId\": \"94f44...a8738e\"}' localhost:9000 proto.Authentication/Refresh
+
+Response:
+
+    {
+
+    }
 
 ## Build
 

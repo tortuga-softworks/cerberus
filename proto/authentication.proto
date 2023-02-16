@@ -7,8 +7,8 @@ option go_package = "github.com/tortuga-softworks/cerberus/proto";
 service Authentication {
     rpc Login (LoginRequest) returns (LoginResponse);
     rpc Logout (LogoutRequest) returns (LogoutResponse);
-    rpc ValidateSession (ValidateSessionRequest) returns (ValidateSessionResponse);
-    rpc RefreshSession (RefreshSessionRequest) returns (RefreshSessionResponse);
+    rpc Verify (VerifyRequest) returns (VerifyResponse);
+    rpc Refresh (RefreshRequest) returns (RefreshResponse);
 }
 
 message LoginRequest {
@@ -25,16 +25,16 @@ message LogoutRequest {
 
 message LogoutResponse {}
 
-message ValidateSessionRequest {
+message VerifyRequest {
     string session_id = 1;
 }
 
-message ValidateSessionResponse {
+message VerifyResponse {
 }
 
-message RefreshSessionRequest {
+message RefreshRequest {
     string session_id = 1;
 }
 
-message RefreshSessionResponse {
+message RefreshResponse {
 }

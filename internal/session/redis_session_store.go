@@ -40,3 +40,13 @@ func (rss *RedisSessionStore) CreateSession(username string) (*Session, error) {
 
 	return &session, nil
 }
+
+func (rss *RedisSessionStore) RefreshSession(sessionID string) (bool, error) {
+	sessionKey := "session:" + sessionID
+	expiration := time.Duration(rss.sessionDuration) * time.Second
+	exists, err := rss.client.Expire(sessionKey, expiration).Result()
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
