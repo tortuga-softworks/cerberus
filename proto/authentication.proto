@@ -5,25 +5,25 @@ package proto;
 option go_package = "github.com/tortuga-softworks/cerberus/proto";
 
 service Authentication {
-    rpc Login (LoginRequest) returns (LoginResponse);
-    rpc Logout (LogoutRequest) returns (LogoutResponse);
+    rpc LogIn (LogInRequest) returns (LogInResponse);
+    rpc LogOut (LogOutRequest) returns (LogOutResponse);
     rpc Verify (VerifyRequest) returns (VerifyResponse);
     rpc Refresh (RefreshRequest) returns (RefreshResponse);
 }
 
-message LoginRequest {
-    string username = 1;
+message LogInRequest {
+    string email = 1;
 }
 
-message LoginResponse {
+message LogInResponse {
     string session_id = 1;
 }
 
-message LogoutRequest {
+message LogOutRequest {
     string session_id = 1;
 }
 
-message LogoutResponse {}
+message LogOutResponse {}
 
 message VerifyRequest {
     string session_id = 1;

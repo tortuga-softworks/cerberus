@@ -1,9 +1,10 @@
 package authentication
 
 import (
-	"cerberus/internal/session"
 	"errors"
 	"strings"
+
+	"github.com/tortuga-softworks/cerberus/internal/session"
 )
 
 type AuthenticationService struct {
@@ -17,8 +18,8 @@ func NewAuthenticationService(sessionStore session.SessionStore) (*Authenticatio
 	return &AuthenticationService{sessionStore}, nil
 }
 
-func (as *AuthenticationService) Login(username string) (string, error) {
-	session, err := as.sessionStore.CreateSession(username)
+func (as *AuthenticationService) LogIn(email string) (string, error) {
+	session, err := as.sessionStore.CreateSession(email)
 
 	if err != nil {
 		return "", err
@@ -27,11 +28,11 @@ func (as *AuthenticationService) Login(username string) (string, error) {
 	return session.ID, nil
 }
 
-// This functions returns whether the username
-func (as *AuthenticationService) ValidateUsername(username string) bool {
-	return strings.Contains(username, "@")
+// This functions returns whether the email
+func (as *AuthenticationService) ValidateEmail(email string) bool {
+	return strings.Contains(email, "@")
 }
 
-func (as *AuthenticationService) Refresh(sessionID string) (bool, error) {
+func (as *AuthenticationService) Refresh(sessionID string) error {
 	return as.sessionStore.RefreshSession(sessionID)
 }

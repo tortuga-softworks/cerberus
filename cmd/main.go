@@ -1,10 +1,11 @@
 package main
 
 import (
-	"cerberus/internal/authentication"
-	"cerberus/internal/session"
-	pb "cerberus/proto"
 	"strconv"
+
+	"github.com/tortuga-softworks/cerberus/internal/authentication"
+	"github.com/tortuga-softworks/cerberus/internal/session"
+	"github.com/tortuga-softworks/cerberus/proto"
 
 	"fmt"
 	"net"
@@ -17,33 +18,32 @@ import (
 func main() {
 	fmt.Println("<== Cerberus ==>")
 
-	sessionStore := initSessionStore()                                                    // sessions storage management
-	authService := initAuthService(sessionStore)                                          // auth logic
-	authServer := authentication.AuthenticationServer{AuthenticationService: authService} // requests routing
+	sessionStore := initSessionStore()           // sessions storage management
+	authService := initAuthService(sessionStore) // auth logic
+	authServer := initAuthServer(authService)    // requests routing
 
 	listener := initListener()
 
 	server := grpc.NewServer()
 	reflection.Register(server) // added for services discovery
-	pb.RegisterAuthenticationServer(server, &authServer)
+	proto.RegisterAuthenticationServer(server, authServer)
 	if err := server.Serve(listener); err != nil {
 		panic(err)
 	}
-
 }
 
 func initSessionStore() session.SessionStore {
 	cacheHost := os.Getenv("CERBERUS_SESSIONS_HOST")
 	cachePort := os.Getenv("CERBERUS_SESSIONS_PORT")
 
-	var sessionDuration int
+	var sessionDuration uint64
 
 	sessionDurationString := os.Getenv("CERBERUS_SESSION_DURATION")
 	if sessionDurationString == "" {
 		sessionDuration = 43200
 		fmt.Println("No session duration configration found. Using default: 43200.")
 	} else {
-		parsedSessionDuration, err := strconv.Atoi(sessionDurationString)
+		parsedSessionDuration, err := strconv.ParseUint(sessionDurationString, 10, 32)
 		if err != nil {
 			panic(err)
 		}
@@ -55,10 +55,9 @@ func initSessionStore() session.SessionStore {
 
 	if err != nil {
 		panic(err)
-	} else {
-		fmt.Println("Session store connection established at " + cacheHost + ":" + cachePort)
 	}
 
+	fmt.Println("Session store connection established at " + cacheHost + ":" + cachePort)
 	return sessionStore
 }
 
@@ -67,11 +66,21 @@ func initAuthService(sessionStore session.SessionStore) *authentication.Authenti
 
 	if err != nil {
 		panic(err)
-	} else {
-		fmt.Println("Authentication service ready.")
 	}
 
+	fmt.Println("Authentication service ready.")
 	return authService
+}
+
+func initAuthServer(authenticationService *authentication.AuthenticationService) *authentication.AuthenticationServer {
+	authServer, err := authentication.NewAuthenticationServer(authenticationService)
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Authentication server ready.")
+	return authServer
 }
 
 func initListener() net.Listener {

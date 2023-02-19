@@ -22,8 +22,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthenticationClient interface {
-	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
-	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
+	LogIn(ctx context.Context, in *LogInRequest, opts ...grpc.CallOption) (*LogInResponse, error)
+	LogOut(ctx context.Context, in *LogOutRequest, opts ...grpc.CallOption) (*LogOutResponse, error)
 	Verify(ctx context.Context, in *VerifyRequest, opts ...grpc.CallOption) (*VerifyResponse, error)
 	Refresh(ctx context.Context, in *RefreshRequest, opts ...grpc.CallOption) (*RefreshResponse, error)
 }
@@ -36,18 +36,18 @@ func NewAuthenticationClient(cc grpc.ClientConnInterface) AuthenticationClient {
 	return &authenticationClient{cc}
 }
 
-func (c *authenticationClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
-	out := new(LoginResponse)
-	err := c.cc.Invoke(ctx, "/proto.Authentication/Login", in, out, opts...)
+func (c *authenticationClient) LogIn(ctx context.Context, in *LogInRequest, opts ...grpc.CallOption) (*LogInResponse, error) {
+	out := new(LogInResponse)
+	err := c.cc.Invoke(ctx, "/proto.Authentication/LogIn", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authenticationClient) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error) {
-	out := new(LogoutResponse)
-	err := c.cc.Invoke(ctx, "/proto.Authentication/Logout", in, out, opts...)
+func (c *authenticationClient) LogOut(ctx context.Context, in *LogOutRequest, opts ...grpc.CallOption) (*LogOutResponse, error) {
+	out := new(LogOutResponse)
+	err := c.cc.Invoke(ctx, "/proto.Authentication/LogOut", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -76,8 +76,8 @@ func (c *authenticationClient) Refresh(ctx context.Context, in *RefreshRequest, 
 // All implementations must embed UnimplementedAuthenticationServer
 // for forward compatibility
 type AuthenticationServer interface {
-	Login(context.Context, *LoginRequest) (*LoginResponse, error)
-	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
+	LogIn(context.Context, *LogInRequest) (*LogInResponse, error)
+	LogOut(context.Context, *LogOutRequest) (*LogOutResponse, error)
 	Verify(context.Context, *VerifyRequest) (*VerifyResponse, error)
 	Refresh(context.Context, *RefreshRequest) (*RefreshResponse, error)
 	mustEmbedUnimplementedAuthenticationServer()
@@ -87,11 +87,11 @@ type AuthenticationServer interface {
 type UnimplementedAuthenticationServer struct {
 }
 
-func (UnimplementedAuthenticationServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+func (UnimplementedAuthenticationServer) LogIn(context.Context, *LogInRequest) (*LogInResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LogIn not implemented")
 }
-func (UnimplementedAuthenticationServer) Logout(context.Context, *LogoutRequest) (*LogoutResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
+func (UnimplementedAuthenticationServer) LogOut(context.Context, *LogOutRequest) (*LogOutResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LogOut not implemented")
 }
 func (UnimplementedAuthenticationServer) Verify(context.Context, *VerifyRequest) (*VerifyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Verify not implemented")
@@ -112,38 +112,38 @@ func RegisterAuthenticationServer(s grpc.ServiceRegistrar, srv AuthenticationSer
 	s.RegisterService(&Authentication_ServiceDesc, srv)
 }
 
-func _Authentication_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LoginRequest)
+func _Authentication_LogIn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogInRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthenticationServer).Login(ctx, in)
+		return srv.(AuthenticationServer).LogIn(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.Authentication/Login",
+		FullMethod: "/proto.Authentication/LogIn",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthenticationServer).Login(ctx, req.(*LoginRequest))
+		return srv.(AuthenticationServer).LogIn(ctx, req.(*LogInRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Authentication_Logout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LogoutRequest)
+func _Authentication_LogOut_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogOutRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthenticationServer).Logout(ctx, in)
+		return srv.(AuthenticationServer).LogOut(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.Authentication/Logout",
+		FullMethod: "/proto.Authentication/LogOut",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthenticationServer).Logout(ctx, req.(*LogoutRequest))
+		return srv.(AuthenticationServer).LogOut(ctx, req.(*LogOutRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -192,12 +192,12 @@ var Authentication_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AuthenticationServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Login",
-			Handler:    _Authentication_Login_Handler,
+			MethodName: "LogIn",
+			Handler:    _Authentication_LogIn_Handler,
 		},
 		{
-			MethodName: "Logout",
-			Handler:    _Authentication_Logout_Handler,
+			MethodName: "LogOut",
+			Handler:    _Authentication_LogOut_Handler,
 		},
 		{
 			MethodName: "Verify",

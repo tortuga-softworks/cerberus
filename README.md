@@ -5,32 +5,38 @@ Authentication server
 
 Environment variables: 
 
-| Variable                  | Default value | Description                                |
-|---------------------------|---------------|--------------------------------------------|
-| CERBERUS_PORT             | 9000          | The port the application listens on        |
-| CERBERUS_SESSION_DURATION | 43200         | The duration of a user session, in seconds |
-| CERBERUS_SESSIONS_HOST    |               | The host of the sessions store (Redis)     |
-| CERBERUS_SESSIONS_PORT    |               | The port of the sessions store (Redis)     |
-| CERBERUS_USERS_HOST       |               | The host of the users store                |
-| CERBERUS_USERS_PORT       |               | The port of the users store                |
+| Variable                  | Default value | Description                                  |
+|---------------------------|---------------|----------------------------------------------|
+| CERBERUS_PORT             | 9000          | The port the application listens on          |
+| CERBERUS_SESSION_DURATION | 43200         | The duration of a user session, in seconds   |
+| CERBERUS_SESSIONS_HOST    |               | The host of the sessions store (Redis)       |
+| CERBERUS_SESSIONS_PORT    |               | The port of the sessions store (Redis)       |
+| CERBERUS_ACCOUNTS_DB      |               | The connection string of the users database  |
 
 ## API (TODO)
 
 ### Login
 Request:
 
-    grpcurl -plaintext -d '{\"username\": \"marem@tortugasoftworks\"}' localhost:9000 proto.Authentication/Login
+    proto.Authentication/Login
+    {
+        "email": "marem@tortugasoftworks.com"
+        "password": "123456"
+    }
 
 Response:
 
     {
-    "sessionId": "94f44...a8738e"
+        "sessionId": "94f44...a8738e"
     }
 
 ### Refresh
 Request:
 
-    grpcurl -plaintext -d '{\"sessionId\": \"94f44...a8738e\"}' localhost:9000 proto.Authentication/Refresh
+    proto.Authentication/Refresh
+    {
+        "sessionId": "94f44...a8738e"
+    }
 
 Response:
 

@@ -1,4 +1,4 @@
-module cerberus
+module github.com/tortuga-softworks/cerberus
 
 go 1.20
 

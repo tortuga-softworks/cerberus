@@ -8,15 +8,20 @@ import (
 
 type RedisSessionStore struct {
 	client          *redis.Client
-	sessionDuration int
+	sessionDuration uint64
 }
 
-func NewRedisSessionStore(addr, password string, sessionDuration int) (*RedisSessionStore, error) {
+func NewRedisSessionStore(addr, password string, sessionDuration uint64) (*RedisSessionStore, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:     addr,
 		Password: password, // no password set
 		DB:       0,        // use default DB
 	})
+
+	_, err := client.Ping().Result()
+	if err != nil {
+		return nil, CacheError{err.Error()}
+	}
 
 	return &RedisSessionStore{client, sessionDuration}, nil
 }
@@ -25,28 +30,35 @@ func (rss *RedisSessionStore) CreateSession(username string) (*Session, error) {
 	sessionID, sessionIDErr := generateSessionID()
 
 	if sessionIDErr != nil {
-		return nil, sessionIDErr
+		return nil, CacheError{sessionIDErr.Error()}
 	}
 
 	creationTime := time.Now()
 	session := Session{ID: sessionID, Username: username, CreationTime: creationTime}
 	sessionKey := "session:" + sessionID
-	expiration := rss.sessionDuration * int(time.Second)
+	expiration := rss.sessionDuration * uint64(time.Second)
 
 	err := rss.client.Set(sessionKey, session, time.Duration(expiration)).Err()
 	if err != nil {
-		return nil, err
+		return nil, CacheError{err.Error()}
 	}
 
 	return &session, nil
 }
 
-func (rss *RedisSessionStore) RefreshSession(sessionID string) (bool, error) {
+func (rss *RedisSessionStore) RefreshSession(sessionID string) error {
 	sessionKey := "session:" + sessionID
 	expiration := time.Duration(rss.sessionDuration) * time.Second
-	exists, err := rss.client.Expire(sessionKey, expiration).Result()
+
+	refreshed, err := rss.client.Expire(sessionKey, expiration).Result()
+
 	if err != nil {
-		return false, err
+		return CacheError{err.Error()}
 	}
-	return exists, nil
+
+	if !refreshed {
+		return &SessionNotFoundError{sessionID}
+	}
+
+	return nil
 }
