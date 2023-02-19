@@ -58,10 +58,14 @@ func validateEmail(email string) bool {
 	return strings.Contains(email, "@")
 }
 
+func checkPassword(hashedPassword []byte, password string) error {
+	return bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
+}
+
 func (service *AuthenticationService) Refresh(ctx context.Context, sessionID string) error {
 	return service.sessionStore.RefreshSession(ctx, sessionID)
 }
 
-func checkPassword(hashedPassword []byte, password string) error {
-	return bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
+func (service *AuthenticationService) LogOut(ctx context.Context, sessionID string) error {
+	return service.sessionStore.DeleteSession(ctx, sessionID)
 }

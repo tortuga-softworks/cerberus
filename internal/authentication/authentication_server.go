@@ -60,3 +60,15 @@ func (as *AuthenticationServer) Refresh(ctx context.Context, in *proto.RefreshRe
 
 	return &proto.RefreshResponse{}, nil
 }
+
+func (as *AuthenticationServer) LogOut(ctx context.Context, in *proto.LogOutRequest) (*proto.LogOutResponse, error) {
+	var sessionID = in.SessionId
+
+	err := as.authenticationService.LogOut(ctx, sessionID)
+
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "%v: %v", reflect.TypeOf(err), err)
+	}
+
+	return &proto.LogOutResponse{}, nil
+}

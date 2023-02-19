@@ -81,7 +81,7 @@ func initSessionStore() session.SessionStore {
 		panic(err)
 	}
 
-	fmt.Println("Session store connection established at " + cacheHost + ":" + cachePort)
+	fmt.Println("Session store ready.")
 	return sessionStore
 }
 

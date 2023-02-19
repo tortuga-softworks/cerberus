@@ -63,3 +63,15 @@ func (rss *RedisSessionStore) RefreshSession(ctx context.Context, sessionID stri
 
 	return nil
 }
+
+func (rss *RedisSessionStore) DeleteSession(ctx context.Context, sessionID string) error {
+	sessionKey := "session:" + sessionID
+
+	err := rss.client.Del(sessionKey).Err()
+
+	if err != nil {
+		return CacheError{err.Error()}
+	}
+
+	return nil
+}
