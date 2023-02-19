@@ -45,7 +45,7 @@ func (service *AuthenticationService) LogIn(ctx context.Context, email string, p
 		}
 	}
 
-	session, err := service.sessionStore.CreateSession(ctx, account.UserID)
+	session, err := service.sessionStore.Create(ctx, account.UserID)
 	if err != nil {
 		return "", err
 	}
@@ -63,15 +63,15 @@ func checkPassword(hashedPassword []byte, password string) error {
 }
 
 func (service *AuthenticationService) Refresh(ctx context.Context, sessionID string) error {
-	return service.sessionStore.RefreshSession(ctx, sessionID)
+	return service.sessionStore.Refresh(ctx, sessionID)
 }
 
 func (service *AuthenticationService) LogOut(ctx context.Context, sessionID string) error {
-	return service.sessionStore.DeleteSession(ctx, sessionID)
+	return service.sessionStore.Delete(ctx, sessionID)
 }
 
 func (service *AuthenticationService) Verify(ctx context.Context, sessionID string) (string, error) {
-	session, err := service.sessionStore.FindSessionByID(ctx, sessionID)
+	session, err := service.sessionStore.FindByID(ctx, sessionID)
 
 	if err != nil {
 		return "", err
