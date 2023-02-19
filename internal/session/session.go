@@ -10,16 +10,12 @@ import (
 
 type Session struct {
 	ID           string
-	Email        string
+	UserID       string
 	CreationTime time.Time
 }
 
 func (s Session) MarshalBinary() ([]byte, error) {
 	return json.Marshal(s)
-}
-
-func (s *Session) UnmarshalBinary(b []byte) error {
-	return json.Unmarshal(b, s)
 }
 
 // Generates a random session ID.

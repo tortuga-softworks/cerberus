@@ -31,6 +31,7 @@ message VerifyRequest {
 }
 
 message VerifyResponse {
+    string user_id = 1;
 }
 
 message RefreshRequest {

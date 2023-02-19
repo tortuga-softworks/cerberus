@@ -2,6 +2,7 @@ package session
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -27,7 +28,7 @@ func NewRedisSessionStore(addr, password string, sessionDuration uint64) (*Redis
 	return &RedisSessionStore{client, sessionDuration}, nil
 }
 
-func (rss *RedisSessionStore) CreateSession(ctx context.Context, email string) (*Session, error) {
+func (rss *RedisSessionStore) CreateSession(ctx context.Context, userID string) (*Session, error) {
 	sessionID, sessionIDErr := generateSessionID()
 
 	if sessionIDErr != nil {
@@ -35,13 +36,35 @@ func (rss *RedisSessionStore) CreateSession(ctx context.Context, email string) (
 	}
 
 	creationTime := time.Now()
-	session := Session{ID: sessionID, Email: email, CreationTime: creationTime}
+	session := Session{ID: sessionID, UserID: userID, CreationTime: creationTime}
 	sessionKey := "session:" + sessionID
 	expiration := time.Duration(rss.sessionDuration * uint64(time.Second))
 
 	err := rss.client.Set(sessionKey, session, expiration).Err()
 	if err != nil {
 		return nil, CacheError{err.Error()}
+	}
+
+	return &session, nil
+}
+
+func (rss *RedisSessionStore) FindSessionByID(ctx context.Context, sessionID string) (*Session, error) {
+	sessionKey := "session:" + sessionID
+	data, err := rss.client.Get(sessionKey).Result()
+
+	if err != nil {
+		if err == redis.Nil {
+			return nil, &SessionNotFoundError{SessionID: sessionID}
+		} else if err != nil {
+			return nil, &CacheError{err.Error()}
+		}
+	}
+
+	var session Session
+	err = json.Unmarshal([]byte(data), &session)
+
+	if err != nil {
+		return nil, &CacheError{err.Error()}
 	}
 
 	return &session, nil

@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/tortuga-softworks/cerberus/proto"
+	"github.com/tortuga-softworks/hestia/pkg/account"
 
 	"context"
 
@@ -35,6 +36,8 @@ func (as *AuthenticationServer) LogIn(ctx context.Context, in *proto.LogInReques
 		switch err.(type) {
 		case *EmailFormatError:
 			return nil, status.Error(codes.InvalidArgument, "email")
+		case *account.AccountNotFoundError:
+			return nil, status.Error(codes.Unauthenticated, email)
 		case *PasswordMismatchError:
 			return nil, status.Error(codes.Unauthenticated, email)
 		default:
@@ -71,4 +74,21 @@ func (as *AuthenticationServer) LogOut(ctx context.Context, in *proto.LogOutRequ
 	}
 
 	return &proto.LogOutResponse{}, nil
+}
+
+func (as *AuthenticationServer) Verify(ctx context.Context, in *proto.VerifyRequest) (*proto.VerifyResponse, error) {
+	var sessionID = in.SessionId
+
+	userId, err := as.authenticationService.Verify(ctx, sessionID)
+
+	if err != nil {
+		switch err.(type) {
+		case *session.SessionNotFoundError:
+			return nil, status.Error(codes.Unauthenticated, sessionID)
+		default:
+			return nil, status.Errorf(codes.Internal, "%v: %v", reflect.TypeOf(err), err)
+		}
+	}
+
+	return &proto.VerifyResponse{UserId: userId}, nil
 }
