@@ -1,11 +1,14 @@
 package main
 
 import (
+	"database/sql"
 	"strconv"
 
 	"github.com/tortuga-softworks/cerberus/internal/authentication"
 	"github.com/tortuga-softworks/cerberus/internal/session"
 	"github.com/tortuga-softworks/cerberus/proto"
+
+	"github.com/tortuga-softworks/hestia/pkg/account"
 
 	"fmt"
 	"net"
@@ -18,9 +21,10 @@ import (
 func main() {
 	fmt.Println("<== Cerberus ==>")
 
-	sessionStore := initSessionStore()           // sessions storage management
-	authService := initAuthService(sessionStore) // auth logic
-	authServer := initAuthServer(authService)    // requests routing
+	accountStore := initAccountStore()
+	sessionStore := initSessionStore()                         // sessions storage management
+	authService := initAuthService(accountStore, sessionStore) // auth logic
+	authServer := initAuthServer(authService)                  // requests routing
 
 	listener := initListener()
 
@@ -30,6 +34,26 @@ func main() {
 	if err := server.Serve(listener); err != nil {
 		panic(err)
 	}
+}
+
+func initAccountStore() account.AccountStore {
+	dbConnectionString := os.Getenv("CERBERUS_ACCOUNTS_DB")
+
+	db, err := sql.Open("postgres", dbConnectionString)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Connected to PostgreSQL.")
+
+	store, err := account.NewSqlAccountStore(db)
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Account store ready.")
+	return store
 }
 
 func initSessionStore() session.SessionStore {
@@ -61,8 +85,8 @@ func initSessionStore() session.SessionStore {
 	return sessionStore
 }
 
-func initAuthService(sessionStore session.SessionStore) *authentication.AuthenticationService {
-	authService, err := authentication.NewAuthenticationService(sessionStore)
+func initAuthService(accountStore account.AccountStore, sessionStore session.SessionStore) *authentication.AuthenticationService {
+	authService, err := authentication.NewAuthenticationService(accountStore, sessionStore)
 
 	if err != nil {
 		panic(err)

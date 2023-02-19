@@ -10,7 +10,7 @@ import (
 
 type Session struct {
 	ID           string
-	Username     string
+	Email        string
 	CreationTime time.Time
 }
 

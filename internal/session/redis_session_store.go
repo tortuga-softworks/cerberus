@@ -1,6 +1,7 @@
 package session
 
 import (
+	"context"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -26,7 +27,7 @@ func NewRedisSessionStore(addr, password string, sessionDuration uint64) (*Redis
 	return &RedisSessionStore{client, sessionDuration}, nil
 }
 
-func (rss *RedisSessionStore) CreateSession(username string) (*Session, error) {
+func (rss *RedisSessionStore) CreateSession(ctx context.Context, email string) (*Session, error) {
 	sessionID, sessionIDErr := generateSessionID()
 
 	if sessionIDErr != nil {
@@ -34,11 +35,11 @@ func (rss *RedisSessionStore) CreateSession(username string) (*Session, error) {
 	}
 
 	creationTime := time.Now()
-	session := Session{ID: sessionID, Username: username, CreationTime: creationTime}
+	session := Session{ID: sessionID, Email: email, CreationTime: creationTime}
 	sessionKey := "session:" + sessionID
-	expiration := rss.sessionDuration * uint64(time.Second)
+	expiration := time.Duration(rss.sessionDuration * uint64(time.Second))
 
-	err := rss.client.Set(sessionKey, session, time.Duration(expiration)).Err()
+	err := rss.client.Set(sessionKey, session, expiration).Err()
 	if err != nil {
 		return nil, CacheError{err.Error()}
 	}
@@ -46,9 +47,9 @@ func (rss *RedisSessionStore) CreateSession(username string) (*Session, error) {
 	return &session, nil
 }
 
-func (rss *RedisSessionStore) RefreshSession(sessionID string) error {
+func (rss *RedisSessionStore) RefreshSession(ctx context.Context, sessionID string) error {
 	sessionKey := "session:" + sessionID
-	expiration := time.Duration(rss.sessionDuration) * time.Second
+	expiration := time.Duration(rss.sessionDuration * uint64(time.Second))
 
 	refreshed, err := rss.client.Expire(sessionKey, expiration).Result()
 

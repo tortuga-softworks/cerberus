@@ -1,8 +1,10 @@
 package session
 
+import "context"
+
 type SessionStore interface {
-	CreateSession(username string) (*Session, error)
-	// RetrieveSession(sessionID string) (bool, error)
-	RefreshSession(sessionID string) error
-	// DeleteSession(sessionID string) (string, error)
+	CreateSession(ctx context.Context, username string) (*Session, error)
+	// RetrieveSession(ctx context.Context, sessionID string) (bool, error)
+	RefreshSession(ctx context.Context, sessionID string) error
+	// DeleteSession(ctx context.Context, sessionID string) (string, error)
 }

@@ -13,6 +13,7 @@ service Authentication {
 
 message LogInRequest {
     string email = 1;
+    string password = 2;
 }
 
 message LogInResponse {

@@ -21,34 +21,35 @@ type AuthenticationServer struct {
 
 func NewAuthenticationServer(authenticationService *AuthenticationService) (*AuthenticationServer, error) {
 	if authenticationService == nil {
-		return nil, errors.New("the session store can not be nil")
+		return nil, errors.New("could not create a authentication server: authentication service is nil")
 	}
 	return &AuthenticationServer{authenticationService: authenticationService}, nil
 }
 
 func (as *AuthenticationServer) LogIn(ctx context.Context, in *proto.LogInRequest) (*proto.LogInResponse, error) {
 	var email = in.Email
+	var password = in.Password
 
-	if as.authenticationService.ValidateEmail(email) {
-		sessionID, err := as.authenticationService.LogIn(email)
-
-		if err != nil {
-			return nil, err
+	sessionID, err := as.authenticationService.LogIn(ctx, email, password)
+	if err != nil {
+		switch err.(type) {
+		case *EmailFormatError:
+			return nil, status.Error(codes.InvalidArgument, "email")
+		case *PasswordMismatchError:
+			return nil, status.Error(codes.Unauthenticated, email)
+		default:
+			return nil, status.Errorf(codes.Internal, "%v: %v", reflect.TypeOf(err), err)
 		}
-
-		return &proto.LogInResponse{SessionId: sessionID}, nil
-	} else {
-		return nil, status.Error(codes.InvalidArgument, "email")
 	}
+
+	return &proto.LogInResponse{SessionId: sessionID}, nil
 }
 
 func (as *AuthenticationServer) Refresh(ctx context.Context, in *proto.RefreshRequest) (*proto.RefreshResponse, error) {
 	var sessionID = in.SessionId
 
-	err := as.authenticationService.Refresh(sessionID)
-	if err == nil {
-		return &proto.RefreshResponse{}, nil
-	} else {
+	err := as.authenticationService.Refresh(ctx, sessionID)
+	if err != nil {
 		switch err.(type) {
 		case *session.SessionNotFoundError:
 			return nil, status.Error(codes.NotFound, sessionID)
@@ -56,4 +57,6 @@ func (as *AuthenticationServer) Refresh(ctx context.Context, in *proto.RefreshRe
 			return nil, status.Errorf(codes.Internal, "%v: %v", reflect.TypeOf(err), err)
 		}
 	}
+
+	return &proto.RefreshResponse{}, nil
 }
